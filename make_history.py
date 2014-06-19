@@ -6,7 +6,6 @@ if len(sys.argv) < 2:
     sys.exit(0)
 
 
-sourceBranch = "master"
 codeDir = './code/'
 existingFiles = []
 
@@ -22,8 +21,8 @@ def randomWord(length):
 def randomLine():
     return ' '.join([randomWord(random.randint(6,10)) for ii in range(4,random.randint(5,10)) ])
 
-def commit():
-    global sourceBranch, existingFiles, codeDir    
+def commit(sourceBranch):
+    global existingFiles, codeDir    
 
     branchPrefix = 'dev'
     if sourceBranch is 'master':
@@ -70,33 +69,29 @@ def checkout(branch):
         pass
     git.checkout(branch)
 
-def changeBranch():
-    global sourceBranch
+def changeSourceBranch(sourceBranch):
     target = 'development'
     if "development" is sourceBranch:
         target = 'master'
         
     checkout(target)
-    sourceBranch = target
+    return target
 
-def switch(x):
-    return {
-        'commit':commit,
-        'changeBranch':changeBranch
-    }.get(x,False)
 
 gitOperationCount = int(sys.argv[1])
 print "Creating "+str(gitOperationCount) + " git entries"
 
-operations = [(0,80,"commit"),(81,100,"changeBranch")]
-def pickOp():    
+operations = [(0,80,"commit"),(81,100,"changeSourceBranch")]
+def pickOp():
+
     percent = random.randint(0,100)
     for op in operations:    
         if percent >= op[0] and percent <= op[1]:
             return op[2]
 
+sourceBranch = "master"
 while gitOperationCount > 0:
     gitOperationCount -= 1
-    op = pickOp()
-    print "\nOPERATION: "+op
-    switch(op)()
+    if random.randint(0,1) == 1:
+        sourceBranch = changeSourceBranch(sourceBranch)
+    commit(sourceBranch)
