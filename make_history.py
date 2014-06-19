@@ -6,11 +6,15 @@ if len(sys.argv) < 2:
     sys.exit(0)
 
 
-currentBranch = "master"
+sourceBranch = "master"
 codeDir = './code/'
-if not os.path.exists(codeDir):
-    os.mkdir(codeDir)
-existingFiles = os.listdir(codeDir)
+existingFiles = []
+
+def makeCodeDir():
+    global codeDir,existingFiles
+    if not os.path.exists(codeDir):
+        os.mkdir(codeDir)
+    existingFiles = os.listdir(codeDir)
 
 def randomWord(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))
@@ -19,7 +23,17 @@ def randomLine():
     return ' '.join([randomWord(random.randint(6,10)) for ii in range(4,random.randint(5,10)) ])
 
 def commit():
-    global currentBranch, existingFiles, codeDir    
+    global sourceBranch, existingFiles, codeDir    
+
+    branchPrefix = 'dev'
+    if sourceBranch is 'master':
+        branchPrefix = 'stable'
+    checkout(sourceBranch)
+    ticket = str(random.randint(1000,4000))    
+    featureBranch=branchPrefix+"/cfo"+ticket
+    checkout(featureBranch)
+    makeCodeDir()
+
     fileChanges = random.randint(1,5)    
     print "Making "+str(fileChanges)+" file changes in the code directory"
     while fileChanges > 0:
@@ -40,12 +54,15 @@ def commit():
             f.write(line)
         f.close()
 
-    print "Commiting all file changes on `"+currentBranch+"`"
+
+    print "Commiting all file changes on `"+featureBranch+"`"
     git.add("-A",".")
-    ticket = str(random.randint(1000,4000))
+    
     git.commit("-am",'"CFO-'+ticket+' - Helpful message about this commit"')
+    checkout(sourceBranch)
 
 def checkout(branch):
+    print "Checking out "+branch
     try:    
         # Branch already exists
         git.checkout('-b',branch)
@@ -54,57 +71,32 @@ def checkout(branch):
     git.checkout(branch)
 
 def changeBranch():
-    global currentBranch
+    global sourceBranch
     target = 'development'
-    source = 'master'    
-    if "development" is currentBranch:
+    if "development" is sourceBranch:
         target = 'master'
-        source = 'development'
         
-    print "Checking out "+target
     checkout(target)
-    currentBranch = target
-
-def merge(source,target):
-    global codeDir
-    checkout(source)
-    try:
-        git.merge(target)
-    except:
-        print "Conflicts occurred - Blowing away all code and keep going"
-        shutil.rmtree(codeDir)
-        os.mkdir(codeDir)
-        commit()
-        
-
-def merge1():
-    print "Merging master into development"
-    merge('development','master')
-
-def merge2():
-    print "Merging development into master"
-    merge('master','development')
+    sourceBranch = target
 
 def switch(x):
     return {
         'commit':commit,
-        'changeBranch':changeBranch,
-        'merge1':merge1,
-        'merge2':merge2
+        'changeBranch':changeBranch
     }.get(x,False)
 
-entriesCount = int(sys.argv[1])
-print "Creating "+str(entriesCount) + " git entries"
+gitOperationCount = int(sys.argv[1])
+print "Creating "+str(gitOperationCount) + " git entries"
 
-operations = [(0,80,"commit"),(81,96,"changeBranch"),(97,98,"merge1"),(99,100,"merge2")]
+operations = [(0,80,"commit"),(81,100,"changeBranch")]
 def pickOp():    
     percent = random.randint(0,100)
     for op in operations:    
         if percent >= op[0] and percent <= op[1]:
             return op[2]
 
-while entriesCount > 0:
-    entriesCount -= 1
+while gitOperationCount > 0:
+    gitOperationCount -= 1
     op = pickOp()
-    print "Performing "+op
+    print "\nOPERATION: "+op
     switch(op)()
