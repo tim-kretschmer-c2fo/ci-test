@@ -21,6 +21,9 @@ def randomWord(length):
 def randomLine():
     return ' '.join([randomWord(random.randint(6,10)) for ii in range(4,random.randint(5,10)) ])
 
+# Checks out the proper source branch
+# Checks out a feature branch from the source
+# Makes random commits against the branch
 def commit(sourceBranch):
     global existingFiles, codeDir    
 
@@ -72,22 +75,12 @@ def checkout(branch):
 def changeSourceBranch(sourceBranch):
     target = 'development'
     if "development" is sourceBranch:
-        target = 'master'
-        
-    checkout(target)
+        target = 'master'        
     return target
 
 
 gitOperationCount = int(sys.argv[1])
 print "Creating "+str(gitOperationCount) + " git entries"
-
-operations = [(0,80,"commit"),(81,100,"changeSourceBranch")]
-def pickOp():
-
-    percent = random.randint(0,100)
-    for op in operations:    
-        if percent >= op[0] and percent <= op[1]:
-            return op[2]
 
 sourceBranch = "master"
 while gitOperationCount > 0:
