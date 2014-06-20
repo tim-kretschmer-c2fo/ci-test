@@ -85,7 +85,7 @@ print "Creating "+str(gitOperationCount) + " git entries"
 
 sourceBranch = "master"
 while gitOperationCount > 0:
-    print "\Prepping another commit"
+    print "\nPrepping another commit"
     gitOperationCount -= 1
     if random.randint(0,1) == 1:
         sourceBranch = changeSourceBranch(sourceBranch)
