@@ -32,7 +32,7 @@ def commit(sourceBranch):
         branchPrefix = 'stable'
     checkout(sourceBranch)
     ticket = str(random.randint(1000,4000))    
-    featureBranch=branchPrefix+"/cfo-"+ticket
+    featureBranch=branchPrefix+"/cfo-"+ticket+"-"+str(uuid.uuid4())
     checkout(featureBranch)
     makeCodeDir()
 
