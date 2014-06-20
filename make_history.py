@@ -21,6 +21,16 @@ def randomWord(length):
 def randomLine():
     return ' '.join([randomWord(random.randint(6,10)) for ii in range(4,random.randint(5,10)) ])
 
+def checkout(branch):
+    print "Checking out "+branch
+    try:        
+        git.checkout('-b',branch)
+    except:
+        # Branch already exists, check skip creation flag
+        git.checkout(branch)
+        pass
+    
+
 # Checks out the proper source branch
 # Checks out a feature branch from the source
 # Makes random commits against the branch
@@ -63,15 +73,6 @@ def commit(sourceBranch):
     git.commit("-am",'"CFO-'+ticket+' - Helpful message about this commit"')
     checkout(sourceBranch)
 
-def checkout(branch):
-    print "Checking out "+branch
-    try:    
-        # Branch already exists
-        git.checkout('-b',branch)
-    except:
-        pass
-    git.checkout(branch)
-
 def changeSourceBranch(sourceBranch):
     target = 'development'
     if "development" is sourceBranch:
@@ -84,6 +85,7 @@ print "Creating "+str(gitOperationCount) + " git entries"
 
 sourceBranch = "master"
 while gitOperationCount > 0:
+    print "\Prepping another commit"
     gitOperationCount -= 1
     if random.randint(0,1) == 1:
         sourceBranch = changeSourceBranch(sourceBranch)
