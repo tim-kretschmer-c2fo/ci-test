@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 from sh import git
 import sys, random, uuid, string, os, shutil
 

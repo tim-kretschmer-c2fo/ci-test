@@ -9,6 +9,8 @@ if [ -z "$1" ]
     exit
 fi
 
+git reset --hard
+git checkout master
 git branch | grep -E stable/ | xargs -I % git branch -D %
 git branch | grep dev/ | xargs -I % git branch -D %
 git branch -r | grep dev/ | sed "s/origin\///" | xargs -I % git push origin :%
